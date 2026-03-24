@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.frontend.controller.MainController"
+            stylesheets="@../css/style.css">
+
+    <!-- ── BARRE DU HAUT ──────────────────────────────────────────────────── -->
+    <top>
+        <HBox styleClass="page-top" alignment="CENTER_LEFT" spacing="12">
+            <padding><Insets top="12" right="20" bottom="12" left="20"/></padding>
+            <Label text="🍽 RecetteApp" styleClass="logo-text"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="recettesCountLabel" styleClass="page-subtitle"/>
+            <Button text="+ Nouvelle recette" styleClass="primary-btn" onAction="#showNewForm"/>
+        </HBox>
+    </top>
+
+    <!-- ── SIDEBAR GAUCHE ─────────────────────────────────────────────────── -->
+    <left>
+        <VBox styleClass="sidebar" prefWidth="245">
+
+            <!-- Recherche et filtres -->
+            <VBox spacing="8">
+                <padding><Insets top="16" right="12" bottom="8" left="12"/></padding>
+                <TextField fx:id="searchField" promptText="Rechercher..." styleClass="search-field"/>
+                <ComboBox fx:id="categorieFilter" promptText="Toutes les catégories"
+                          styleClass="filter-combo" maxWidth="Infinity"/>
+                <ComboBox fx:id="regimeFilter" promptText="Tous les régimes"
+                          styleClass="filter-combo" maxWidth="Infinity"/>
+                <Button text="Réinitialiser filtres" styleClass="secondary-btn"
+                        onAction="#resetFilters" maxWidth="Infinity"/>
+            </VBox>
+
+            <Separator styleClass="sidebar-divider"/>
+
+            <!-- Catégories -->
+            <VBox spacing="8">
+                <padding><Insets top="8" right="12" bottom="8" left="12"/></padding>
+                <Label text="CATÉGORIES" styleClass="nav-section-label"/>
+                <ScrollPane fitToWidth="true" prefHeight="120" styleClass="scroll-pane">
+                    <VBox fx:id="categoriesList" spacing="4">
+                        <padding><Insets top="2" right="4" bottom="2" left="4"/></padding>
+                    </VBox>
+                </ScrollPane>
+                <HBox spacing="6">
+                    <TextField fx:id="newCategorieField" promptText="Nouvelle catégorie..."
+                               styleClass="form-field" HBox.hgrow="ALWAYS"/>
+                    <Button text="+" styleClass="primary-btn" onAction="#addCategorie" minWidth="32"/>
+                </HBox>
+            </VBox>
+
+            <Separator styleClass="sidebar-divider"/>
+
+            <!-- Régimes -->
+            <VBox spacing="8">
+                <padding><Insets top="8" right="12" bottom="8" left="12"/></padding>
+                <Label text="RÉGIMES" styleClass="nav-section-label"/>
+                <ScrollPane fitToWidth="true" prefHeight="120" styleClass="scroll-pane">
+                    <VBox fx:id="regimesList" spacing="4">
+                        <padding><Insets top="2" right="4" bottom="2" left="4"/></padding>
+                    </VBox>
+                </ScrollPane>
+                <HBox spacing="6">
+                    <TextField fx:id="newRegimeField" promptText="Nouveau régime..."
+                               styleClass="form-field" HBox.hgrow="ALWAYS"/>
+                    <Button text="+" styleClass="primary-btn" onAction="#addRegime" minWidth="32"/>
+                </HBox>
+            </VBox>
+
+        </VBox>
+    </left>
+
+    <!-- ── ZONE CENTRALE (3 panneaux superposés dans un StackPane) ────────── -->
+    <center>
+        <StackPane styleClass="content-area">
+
+            <!-- PANNEAU 1 : Liste des recettes (par défaut) -->
+            <VBox fx:id="listPanel">
+                <ProgressIndicator fx:id="loadingIndicator" visible="false"
+                                   maxWidth="40" maxHeight="40" VBox.vgrow="NEVER">
+                    <padding><Insets top="10"/></padding>
+                </ProgressIndicator>
+                <ScrollPane VBox.vgrow="ALWAYS" fitToWidth="true" styleClass="scroll-pane">
+                    <FlowPane fx:id="cardsContainer" hgap="16" vgap="16"
+                              styleClass="cards-container">
+                        <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+                    </FlowPane>
+                </ScrollPane>
+            </VBox>
+
+            <!-- PANNEAU 2 : Détail recette -->
+            <ScrollPane fx:id="detailPanel" visible="false" managed="false"
+                        fitToWidth="true" styleClass="scroll-pane">
+                <VBox spacing="14" styleClass="detail-body">
+                    <padding><Insets top="20" right="24" bottom="24" left="24"/></padding>
+
+                    <!-- En-tête -->
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Button text="← Retour" styleClass="secondary-btn" onAction="#showList"/>
+                        <Label fx:id="detailNom" styleClass="page-title"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button text="✏ Modifier" styleClass="secondary-btn" onAction="#showEditForm"/>
+                        <Button text="🗑 Supprimer" styleClass="danger-btn" onAction="#deleteRecette"/>
+                    </HBox>
+
+                    <!-- Stats -->
+                    <HBox spacing="12" styleClass="detail-section">
+                        <VBox alignment="CENTER" HBox.hgrow="ALWAYS" styleClass="stat-card" spacing="4">
+                            <Label fx:id="detailTemps" styleClass="stat-value"/>
+                            <Label text="min prépa" styleClass="stat-label"/>
+                        </VBox>
+                        <VBox alignment="CENTER" HBox.hgrow="ALWAYS" styleClass="stat-card" spacing="4">
+                            <Label fx:id="detailPersonnes" styleClass="stat-value"/>
+                            <Label text="personnes" styleClass="stat-label"/>
+                        </VBox>
+                        <VBox alignment="CENTER" HBox.hgrow="ALWAYS" styleClass="stat-card" spacing="4">
+                            <Label fx:id="detailCategorie" styleClass="stat-value"/>
+                            <Label text="catégorie" styleClass="stat-label"/>
+                        </VBox>
+                        <VBox alignment="CENTER" HBox.hgrow="ALWAYS" styleClass="stat-card" spacing="4">
+                            <Label fx:id="detailRegime" styleClass="stat-value"/>
+                            <Label text="régime" styleClass="stat-label"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Description -->
+                    <VBox styleClass="detail-section" spacing="8">
+                        <Label text="Description" styleClass="section-title"/>
+                        <Label fx:id="detailDescription" styleClass="detail-value" wrapText="true"/>
+                    </VBox>
+
+                    <!-- Ingrédients -->
+                    <VBox styleClass="detail-section" spacing="8">
+                        <Label text="Ingrédients" styleClass="section-title"/>
+                        <VBox fx:id="compositionsList" spacing="4"/>
+                    </VBox>
+
+                    <!-- Instructions -->
+                    <VBox styleClass="detail-section" spacing="8">
+                        <Label text="Instructions" styleClass="section-title"/>
+                        <TextArea fx:id="detailContenu" editable="false" wrapText="true"
+                                  prefRowCount="8" styleClass="detail-textarea"/>
+                    </VBox>
+                </VBox>
+            </ScrollPane>
+
+            <!-- PANNEAU 3 : Formulaire recette -->
+            <ScrollPane fx:id="formPanel" visible="false" managed="false"
+                        fitToWidth="true" styleClass="scroll-pane">
+                <VBox spacing="14" styleClass="form-container">
+                    <padding><Insets top="20" right="24" bottom="24" left="24"/></padding>
+
+                    <!-- En-tête formulaire -->
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Button text="← Annuler" styleClass="secondary-btn" onAction="#showList"/>
+                        <Label fx:id="formTitle" styleClass="page-title"/>
+                    </HBox>
+
+                    <!-- Informations générales -->
+                    <VBox styleClass="form-section" spacing="10">
+                        <Label text="Informations générales" styleClass="form-section-title"/>
+                        <Label text="Nom *" styleClass="form-label"/>
+                        <TextField fx:id="formNom" promptText="Nom de la recette" styleClass="form-field"/>
+                        <Label text="Description" styleClass="form-label"/>
+                        <TextArea fx:id="formDescription" promptText="Description courte..."
+                                  prefRowCount="3" styleClass="form-textarea" wrapText="true"/>
+                        <HBox spacing="12">
+                            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                <Label text="Temps (min)" styleClass="form-label"/>
+                                <TextField fx:id="formTemps" promptText="ex: 30" styleClass="form-field"/>
+                            </VBox>
+                            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                <Label text="Nb personnes" styleClass="form-label"/>
+                                <TextField fx:id="formPersonnes" promptText="ex: 4" styleClass="form-field"/>
+                            </VBox>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Classification -->
+                    <VBox styleClass="form-section" spacing="10">
+                        <Label text="Classification" styleClass="form-section-title"/>
+                        <HBox spacing="12">
+                            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                <Label text="Catégorie" styleClass="form-label"/>
+                                <ComboBox fx:id="formCategorie" maxWidth="Infinity" styleClass="form-combo"/>
+                            </VBox>
+                            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                <Label text="Régime" styleClass="form-label"/>
+                                <ComboBox fx:id="formRegime" maxWidth="Infinity" styleClass="form-combo"/>
+                            </VBox>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Recette -->
+                    <VBox styleClass="form-section" spacing="10">
+                        <Label text="Recette" styleClass="form-section-title"/>
+                        <Label text="Ingrédients (un par ligne)" styleClass="form-label"/>
+                        <TextArea fx:id="formCompositions"
+                                  promptText="ex: 200g farine&#10;2 oeufs..."
+                                  prefRowCount="5" styleClass="form-textarea" wrapText="true"/>
+                        <Label text="Instructions" styleClass="form-label"/>
+                        <TextArea fx:id="formContenu" promptText="Étapes de préparation..."
+                                  prefRowCount="8" styleClass="form-textarea" wrapText="true"/>
+                    </VBox>
+
+                    <!-- Boutons bas -->
+                    <HBox alignment="CENTER_RIGHT" spacing="10">
+                        <Button text="Annuler" styleClass="secondary-btn" onAction="#showList"/>
+                        <Button text="Enregistrer" styleClass="primary-btn" onAction="#saveRecette"/>
+                    </HBox>
+                </VBox>
+            </ScrollPane>
+
+        </StackPane>
+    </center>
+
+</BorderPane>
