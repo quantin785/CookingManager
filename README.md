@@ -10,7 +10,7 @@ Application de gestion de recettes culinaires — Client lourd JavaFX + API REST
 |-------|-----------------|
 | Java JDK | 21 |
 | Maven | 3.8+ |
-| MySQL | 8.0+ (ou H2 en dev) |
+| Docker & Docker Compose | Dernière version |
 | Git | 2.x |
 
 ---
@@ -19,7 +19,9 @@ Application de gestion de recettes culinaires — Client lourd JavaFX + API REST
 
 ```
 CookingManager/
-├── backend/    — API REST Spring Boot (port 8080)
+├── backend/    — API REST Spring Boot (port 8081)
+│   ├── docker-compose.yml  — MySQL + Adminer
+│   └── init.sql            — Script d'initialisation BDD
 └── frontend/   — Client lourd JavaFX
 ```
 
@@ -34,30 +36,26 @@ git clone https://github.com/quantin785/CookingManager.git
 cd CookingManager
 ```
 
-### 2. Configurer la base de données
-
-#### Option A — MySQL
-
-Créer la base de données :
-
-```sql
-CREATE DATABASE cookingmanager;
-```
-
-Modifier le fichier `backend/src/main/resources/application.properties` :
-
-```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/cookingmanager
-spring.datasource.username=VOTRE_UTILISATEUR
-spring.datasource.password=VOTRE_MOT_DE_PASSE
-spring.jpa.hibernate.ddl-auto=update
-```
-
-#### Option B — Docker (recommandé)
+### 2. Lancer la base de données (Docker)
 
 ```bash
 cd backend
 docker-compose up -d
+```
+
+Cela démarre automatiquement :
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| MySQL | `localhost:3306` | Base de données `recettes_db` |
+| Adminer | `http://localhost:8080` | Interface d'administration BDD |
+
+Identifiants MySQL :
+
+```
+Utilisateur : recettes_user
+Mot de passe : recettes_pass
+Base de données : recettes_db
 ```
 
 ### 3. Lancer le backend
@@ -67,7 +65,7 @@ cd backend
 mvn spring-boot:run
 ```
 
-L'API est accessible sur : `http://localhost:8080`
+L'API est accessible sur : `http://localhost:8081`
 
 ### 4. Lancer le frontend
 
@@ -109,9 +107,10 @@ mvn javafx:run
 | JavaFX | 21 | Interface graphique |
 | Spring Boot | 3.x | Framework backend |
 | Maven | 3.8+ | Gestion des dépendances |
+| MySQL | 8.0 | Base de données (via Docker) |
+| Docker Compose | — | Orchestration MySQL + Adminer |
 | AtlantaFX | 2.0.1 | Thème graphique |
 | Gson | 2.10.1 | Sérialisation JSON |
-| MySQL | 8.0+ | Base de données |
 
 ---
 
