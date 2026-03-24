@@ -69,10 +69,14 @@ L'API est accessible sur : `http://localhost:8081`
 
 ### 4. Lancer le frontend
 
+> **Important** : Le backend doit être démarré avant de lancer le frontend.
+
 ```bash
 cd frontend
 mvn javafx:run
 ```
+
+L'application JavaFX se lance automatiquement.
 
 ---
 
